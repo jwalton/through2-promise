@@ -20,6 +20,21 @@ test("simple transform", function (t) {
 
 });
 
+test("simple transform with push", function (t) {
+	var stream = throughPromise(function (data) {
+		this.push(data);
+		return Promise.resolve();
+	});
+
+	function confirm(results) {
+		t.equals(results.toString(), "helloworld", "passed through properly");
+		t.end();
+	}
+
+	spigot(["hello", "world"]).pipe(stream).pipe(concat(confirm));
+
+});
+
 test("changing transform", function (t) {
 	var stream = throughPromise(function (data) {
 		return data.toString().toUpperCase();
