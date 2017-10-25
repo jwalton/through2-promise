@@ -1,33 +1,65 @@
-# through2-map-promise
-A small promise-based wrapper for through2. Allows you to easily map over data in a stream while using promises for flow control.
+# through2-promise
+A small promise-based wrapper for through2, based on [RangerMauve's through2-map-promise](https://github.com/RangerMauve/through2-map-promise/)
 
 ## Quickstart
 
 ```
-npm install --save through2-map-promise
+npm install --save through2-promise
 ```
 
-```javascript
-var map = require("through2-map-promise");
-var xtend = require("xtend");
+Some examples:
 
-// in an HTTP request handler
-db.users.find({}).pipe(map.obj(function(user){
-    var locationId = user.location;
-    return db.locations.findOne({_id: locationId}).then(function(location){
-        return xtend(user, {
-            location: location
-        });
-    });
-})).pipe(response);
+```javascript
+var through2 = require("through2-promise");
+fs.createReadStream('ex.txt')
+.pipe(through2(function (chunk) {
+    for (var i = 0; i < chunk.length; i++) {
+        if (chunk[i] == 97)
+            chunk[i] = 122; // swap 'a' for 'z'
+
+        this.push(chunk);
+    }
+}))
+.pipe(fs.createWriteStream('out.txt'))
+.on('finish', function () {
+    doSomethingSpecial()
+});
+```
+
+Or object streams:
+
+```javascript
+var all = []
+
+fs.createReadStream('data.csv')
+.pipe(csv2())
+.pipe(through2.obj(function (chunk) {
+    var data = {
+        name    : chunk[0],
+        address : chunk[3],
+        phone   : chunk[10]
+    };
+    this.push(data);
+}))
+.on('data', function (data) {
+    all.push(data)
+})
+.on('end', function () {
+    doSomethingSpecial(all)
+});
 ```
 
 ## API
-### `through2-map-promise([options,] [fn])`
-Creates a transform stream which calls your transforming function, `fn`. You can throw within your function to automatically reject the promise and error-out the stream. `options` is the optional object that gets passed into [through2](https://github.com/rvagg/through2#options).
+### `through2-promise([options,] [fn])`
+Creates a transform stream which calls your transforming function, `fn`. You can throw within your function to
+automatically reject the promise and error-out the stream. `options` is the optional object that gets passed into [through2](https://github.com/rvagg/through2#options).
 
-### `through2-map-promise.obj([options,] [fn])`
-Same as the former, but the stream is created in objectMode
+`this` is the through2 stream, so you can do `this.push()` just like in through2.  If you return a Promise, and
+the Promise resolves to a value, this value will be written to the stream (just like passing a value to the
+callback in through2).
 
-### `through2-map-promise.ctor([options,] [fn])`
-Creates a constructor for your transform stream in case you want to be more efficient
+### `through2-promise.obj([options,] [fn])`
+Same as the former, but the stream is created in objectMode.
+
+### `through2-promise.ctor([options,] [fn])`
+Creates a constructor for your transform stream in case you want to be more efficient.
