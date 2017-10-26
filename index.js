@@ -36,15 +36,13 @@ function makeCtor(options, transform, flush) {
 	function doTransform(chunk, encoding, callback) {
 		Promise.resolve(chunk)
 		.then(transform.bind(this))
-		.then(function (result) {callback(null, result);})
-		.catch(callback);
+		.then(function (result) {callback(null, result);}, callback);
 	}
 
 	function doFlush(callback) {
 		if(flush) {
 			Promise.resolve(flush.bind(this)())
-			.then(function(result) {callback(null, result);})
-			.catch(callback);
+			.then(function (result) {callback(null, result);}, callback);
 		} else {
 			callback();
 		}
