@@ -50,7 +50,7 @@ fs.createReadStream('data.csv')
 ```
 
 ## API
-### `through2-promise([options,] [fn])`
+### `through2-promise([options,] [fn] [, flushFunction])`
 Creates a transform stream which calls your transforming function, `fn`. You can throw within your function to
 automatically reject the promise and error-out the stream. `options` is the optional object that gets passed into [through2](https://github.com/rvagg/through2#options).
 
@@ -58,8 +58,11 @@ automatically reject the promise and error-out the stream. `options` is the opti
 the Promise resolves to a value, this value will be written to the stream (just like passing a value to the
 callback in through2).
 
-### `through2-promise.obj([options,] [fn])`
+`flushFunction()` is a function that runs after the source stream has been consumed.  It has access to `this.push()`,
+and also any value returned will be appended to the written results.
+
+### `through2-promise.obj([options,] [fn] [, flushFunction])`
 Same as the former, but the stream is created in objectMode.
 
-### `through2-promise.ctor([options,] [fn])`
+### `through2-promise.ctor([options,] [fn] [, flushFunction])`
 Creates a constructor for your transform stream in case you want to be more efficient.

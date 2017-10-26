@@ -10,40 +10,51 @@ module.exports = create;
 module.exports.ctor = ctor;
 module.exports.obj = obj;
 
-function create(options, transform) {
-	return new(ctor(options, transform))();
+function create(options, transform, flush) {
+	return new(ctor(options, transform, flush))();
 }
 
-function obj(options, transform) {
-	return new(ctorObj(options, transform))();
+function obj(options, transform, flush) {
+	return new(ctorObj(options, transform, flush))();
 }
 
 function ensure_args(creator) {
-	return function (options, transform) {
+	return function (options, transform, flush) {
 		if (typeof options === "function") {
+			flush = transform;
 			transform = options;
 			options = {};
 		}
 
-		return creator(options, transform);
+		return creator(options, transform, flush);
 	};
 }
 
-function makeCtor(options, transform) {
-	return through2.ctor(options, doTransform);
+function makeCtor(options, transform, flush) {
+	return through2.ctor(options, doTransform, doFlush);
 
 	function doTransform(chunk, encoding, callback) {
-		var stream = this;
-		Promise.resolve(chunk).then(transform.bind(stream)).then(function (result) {
-			callback(null, result);
-		}).catch(callback);
+		Promise.resolve(chunk)
+		.then(transform.bind(this))
+		.then(function (result) {callback(null, result);})
+		.catch(callback);
+	}
+
+	function doFlush(callback) {
+		if(flush) {
+			Promise.resolve(flush.bind(this)())
+			.then(function(result) {callback(null, result);})
+			.catch(callback);
+		} else {
+			callback();
+		}
 	}
 }
 
-function makeCtorObj(options, transform) {
+function makeCtorObj(options, transform, flush) {
 	options = xtend(options, {
 		objectMode: true
 	});
 
-	return makeCtor(options, transform);
+	return makeCtor(options, transform, flush);
 }

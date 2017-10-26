@@ -3,6 +3,7 @@ var Promise = require("any-promise");
 var test = require("tape");
 var spigot = require("stream-spigot");
 var concat = require("terminus").concat;
+var pump = require("pump");
 
 var throughPromise = require("../");
 
@@ -99,4 +100,56 @@ test("unpiped", function (t) {
 
 	spigot({objectMode: true}, data)
 	.pipe(out);
+});
+
+test("flush function", function (t) {
+	debugger;
+	var stream = throughPromise(
+		function (data) {return data;},
+		function () {return "!";}
+	);
+
+	var results;
+
+	function confirm(err) {
+		if(err) {
+			return t.end(err);
+		}
+
+		t.equals(results.toString(), "helloworld!", "passed through properly");
+		t.end();
+	}
+
+	pump(
+		spigot(["hello", "world"]),
+		stream,
+		concat(function(answer) {results = answer;}),
+		confirm
+	);
+});
+
+test("flush function (with push)", function (t) {
+	debugger;
+	var stream = throughPromise(
+		function (data) {this.push(data);},
+		function () {this.push("!");}
+	);
+
+	var results;
+
+	function confirm(err) {
+		if(err) {
+			return t.end(err);
+		}
+
+		t.equals(results.toString(), "helloworld!", "passed through properly");
+		t.end();
+	}
+
+	pump(
+		spigot(["hello", "world"]),
+		stream,
+		concat(function(answer) {results = answer;}),
+		confirm
+	);
 });
