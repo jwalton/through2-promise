@@ -1,6 +1,6 @@
 {
   "name": "through2-promise",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A small promise-based wrapper for through2",
   "main": "index.js",
   "scripts": {
