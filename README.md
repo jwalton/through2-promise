@@ -1,4 +1,6 @@
 # through2-promise
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/jwalton/through2-promise.svg)](https://greenkeeper.io/)
 A small promise-based wrapper for through2, based on [RangerMauve's through2-map-promise](https://github.com/RangerMauve/through2-map-promise/)
 
 ## Quickstart
