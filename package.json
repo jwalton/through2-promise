@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jwalton/node-through2-promise.git"
+    "url": "git+https://github.com/jwalton/through2-promise.git"
   },
   "keywords": [
     "through2",
@@ -19,9 +19,9 @@
   "author": "jwalton",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jwalton/node-through2-promise/issues"
+    "url": "https://github.com/jwalton/through2-promise/issues"
   },
-  "homepage": "https://github.com/jwalton/node-through2-promise#readme",
+  "homepage": "https://github.com/jwalton/through2-promise#readme",
   "dependencies": {
     "any-promise": "^1.1.0",
     "through2": "^2.0.1",
